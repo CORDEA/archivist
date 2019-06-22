@@ -30,7 +30,7 @@ service archivist on httpListener {
     }
     resource function getHistories(http:Caller caller, http:Request request) {
         http:Response response = new;
-        response.setPayload(untaint dbHelper.selectAll());
+        response.setJsonPayload(untaint dbHelper.selectAll(), contentType = "application/json");
         var result = caller -> respond(response);
         if (result is error) {
             log:printError("Failed to response", err = result);
@@ -43,6 +43,7 @@ service archivist on httpListener {
     }
     resource function postHistory(http:Caller caller, http:Request request) {
         http:Response response = new;
+        response.setJsonPayload({}, contentType = "application/json");
 
         var payload = request.getJsonPayload();
         if (payload is json) {
@@ -51,8 +52,9 @@ service archivist on httpListener {
                 if (history.command == "") {
                     response.statusCode = 400;
                 } else {
-                    // insert
                     response.statusCode = 201;
+                    history.category = db:UNKNOWN;
+                    response.setJsonPayload(dbHelper.insert(history), contentType = "application/json");
                 }
             } else {
                 response.statusCode = 400;
