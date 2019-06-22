@@ -1,25 +1,12 @@
 import ballerina/http;
 import ballerina/log;
 import ballerina/config;
-import ballerina/mysql;
-import ballerina/sql;
+
+import db;
 
 listener http:Listener httpListener = new(9090);
 
-type History record {
-    int id;
-    string command;
-    string category;
-};
-
-mysql:Client historyDB = new({
-    host: config:getAsString("database.host", defaultValue = "localhost"),
-    port: config:getAsInt("database.port", defaultValue = 3306),
-    name: config:getAsString("database.name", defaultValue = "archivist"),
-    username: config:getAsString("database.username", defaultValue = "root"),
-    password: config:getAsString("database.password", defaultValue = "root"),
-    dbOptions: { useSSL: false, allowPublicKeyRetrieval: true }
-});
+db:DbHelper dbHelper = new();
 
 @http:ServiceConfig { basePath: "/archivist" }
 service archivist on httpListener {
@@ -43,7 +30,7 @@ service archivist on httpListener {
     }
     resource function getHistories(http:Caller caller, http:Request request) {
         http:Response response = new;
-
+        response.setPayload(untaint dbHelper.selectAll());
         var result = caller -> respond(response);
         if (result is error) {
             log:printError("Failed to response", err = result);
@@ -59,8 +46,8 @@ service archivist on httpListener {
 
         var payload = request.getJsonPayload();
         if (payload is json) {
-            History|error history = History.convert(payload);
-            if (history is History) {
+            db:History|error history = db:History.convert(payload);
+            if (history is db:History) {
                 if (history.command == "") {
                     response.statusCode = 400;
                 } else {
