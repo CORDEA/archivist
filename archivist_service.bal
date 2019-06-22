@@ -43,7 +43,6 @@ service archivist on httpListener {
     }
     resource function getHistories(http:Caller caller, http:Request request) {
         http:Response response = new;
-        response.statusCode = 200;
 
         var result = caller -> respond(response);
         if (result is error) {
@@ -58,7 +57,22 @@ service archivist on httpListener {
     resource function postHistory(http:Caller caller, http:Request request) {
         http:Response response = new;
 
-        response.statusCode = 201;
+        var payload = request.getJsonPayload();
+        if (payload is json) {
+            History|error history = History.convert(payload);
+            if (history is History) {
+                if (history.command == "") {
+                    response.statusCode = 400;
+                } else {
+                    // insert
+                    response.statusCode = 201;
+                }
+            } else {
+                response.statusCode = 400;
+            }
+        } else {
+            response.statusCode = 500;
+        }
 
         var result = caller -> respond(response);
         if (result is error) {
