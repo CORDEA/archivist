@@ -15,7 +15,7 @@ type History record {
 mysql:Client historyDB = new({
     host: config:getAsString("DATABASE_HOST", defaultValue = "localhost"),
     port: config:getAsInt("DATABSE_PORT", defaultValue = 3306),
-    name: config:getAsString("DATABASE_NAME", defaultValue = "HISTORIES"),
+    name: config:getAsString("DATABASE_NAME", defaultValue = "archivist"),
     username: config:getAsString("DATABASE_USERNAME", defaultValue = "root"),
     password: config:getAsString("DATABASE_PASSWORD", defaultValue = "root"),
     dbOptions: { useSSL: false, allowPublicKeyRetrieval: true }
