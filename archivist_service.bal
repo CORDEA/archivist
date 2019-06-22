@@ -1,7 +1,25 @@
 import ballerina/http;
 import ballerina/log;
+import ballerina/config;
+import ballerina/mysql;
+import ballerina/sql;
 
 listener http:Listener httpListener = new(9090);
+
+type History record {
+    int id;
+    string command;
+    string category;
+};
+
+mysql:Client historyDB = new({
+    host: config:getAsString("DATABASE_HOST", defaultValue = "localhost"),
+    port: config:getAsInt("DATABSE_PORT", defaultValue = 3306),
+    name: config:getAsString("DATABASE_NAME", defaultValue = "HISTORIES"),
+    username: config:getAsString("DATABASE_USERNAME", defaultValue = "root"),
+    password: config:getAsString("DATABASE_PASSWORD", defaultValue = "root"),
+    dbOptions: { useSSL: false }
+});
 
 @http:ServiceConfig { basePath: "/archivist" }
 service archivist on httpListener {
