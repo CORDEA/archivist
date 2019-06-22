@@ -16,13 +16,14 @@ public type DbHelper object {
         });
     }
 
-    public function insert(History history) returns (boolean) {
+    public function insert(History history) returns json {
         string sql = "INSERT INTO archivist (ID, Command, Category) VALUES (?,?,?)";
         var result = self.historyDB -> update(sql, history.id, history.command, history.category);
-        return result is sql:UpdateResult;
+        var success = result is sql:UpdateResult;
+        return { "result": success };
     }
 
-    public function selectAll() returns (json) {
+    public function selectAll() returns json {
         string sql = "SELECT * FROM archivist";
         var result = self.historyDB -> select(sql, ());
         json returnValue = {};
