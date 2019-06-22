@@ -13,11 +13,11 @@ type History record {
 };
 
 mysql:Client historyDB = new({
-    host: config:getAsString("DATABASE_HOST", defaultValue = "localhost"),
-    port: config:getAsInt("DATABSE_PORT", defaultValue = 3306),
-    name: config:getAsString("DATABASE_NAME", defaultValue = "archivist"),
-    username: config:getAsString("DATABASE_USERNAME", defaultValue = "root"),
-    password: config:getAsString("DATABASE_PASSWORD", defaultValue = "root"),
+    host: config:getAsString("database.host", defaultValue = "localhost"),
+    port: config:getAsInt("database.port", defaultValue = 3306),
+    name: config:getAsString("database.name", defaultValue = "archivist"),
+    username: config:getAsString("database.username", defaultValue = "root"),
+    password: config:getAsString("database.password", defaultValue = "root"),
     dbOptions: { useSSL: false, allowPublicKeyRetrieval: true }
 });
 
