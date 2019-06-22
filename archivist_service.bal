@@ -18,7 +18,7 @@ mysql:Client historyDB = new({
     name: config:getAsString("DATABASE_NAME", defaultValue = "HISTORIES"),
     username: config:getAsString("DATABASE_USERNAME", defaultValue = "root"),
     password: config:getAsString("DATABASE_PASSWORD", defaultValue = "root"),
-    dbOptions: { useSSL: false }
+    dbOptions: { useSSL: false, allowPublicKeyRetrieval: true }
 });
 
 @http:ServiceConfig { basePath: "/archivist" }
