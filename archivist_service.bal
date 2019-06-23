@@ -4,6 +4,8 @@ import ballerina/log;
 import ballerina/config;
 
 import db;
+import rule;
+import history;
 
 listener http:Listener httpListener = new(9090);
 
@@ -52,18 +54,18 @@ service archivist on httpListener {
 
         var payload = request.getJsonPayload();
         if (payload is json) {
-            var history = db:HistoryRequest.convert(payload);
-            if (history is db:HistoryRequest) {
+            var history = history:HistoryRequest.convert(payload);
+            if (history is history:HistoryRequest) {
                 if (history.command == "") {
                     response.statusCode = 400;
                 } else if (containsRule(history.command)){
                     response.statusCode = 400;
                 } else {
                     response.statusCode = 201;
-                    if (db:isValidCategory(history.category)) {
+                    if (history:isValidCategory(history.category)) {
                         history.category = history.category.toUpper();
                     } else {
-                        history.category = db:detectCategory(history.command);
+                        history.category = history:detectCategory(history.command);
                     }
                     response.setJsonPayload(
                         historyController.insert(history),
@@ -109,8 +111,8 @@ service archivist on httpListener {
 
         var payload = request.getJsonPayload();
         if (payload is json) {
-            var rule = db:Rule.convert(payload);
-            if (rule is db:Rule) {
+            var rule = rule:Rule.convert(payload);
+            if (rule is rule:Rule) {
                 if (rule.rule == "") {
                     response.statusCode = 400;
                 } else {

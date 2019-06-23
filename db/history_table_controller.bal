@@ -1,8 +1,10 @@
 import ballerina/sql;
 import ballerina/log;
 
+import history;
+
 public type HistoryTableController object {
-    public function insert(HistoryRequest history) returns json {
+    public function insert(history:HistoryRequest history) returns json {
         string sql = "INSERT INTO histories (Command, Category) VALUES (?, ?)";
         var result = historyDB -> update(sql, history.command, history.category);
         if (result is sql:UpdateResult) {

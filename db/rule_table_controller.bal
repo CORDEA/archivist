@@ -1,8 +1,10 @@
 import ballerina/sql;
 import ballerina/log;
 
+import rule;
+
 public type RuleTableController object {
-    public function insert(Rule rule) returns json {
+    public function insert(rule:Rule rule) returns json {
         string sql = "INSERT INTO rules (Rule) VALUES (?)";
         var result = historyDB -> update(sql, rule.rule);
         if (result is sql:UpdateResult) {
@@ -26,8 +28,8 @@ public type RuleTableController object {
         return returnValue;
     }
 
-    public function selectAllAsObject() returns table<Rule>|error {
+    public function selectAllAsObject() returns table<rule:Rule>|error {
         string sql = "SELECT * FROM rules";
-        return historyDB -> select(sql, Rule);
+        return historyDB -> select(sql, rule:Rule);
     }
 };
