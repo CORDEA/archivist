@@ -4,10 +4,6 @@ public const string UNKNOWN = "UNKNOWN";
 
 public type CATEGORY GIT|TRANS|UNKNOWN;
 
-public function isValidCategory(string category) returns boolean {
-    return category != "";
-}
-
 public function detectCategory(string command) returns CATEGORY {
     if (command.hasPrefix("git")) {
         return GIT;

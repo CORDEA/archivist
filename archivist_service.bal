@@ -62,13 +62,14 @@ service archivist on httpListener {
                     response.statusCode = 400;
                 } else {
                     response.statusCode = 201;
-                    if (history:isValidCategory(history.category)) {
-                        history.category = history.category.toUpper();
-                    } else {
-                        history.category = history:detectCategory(history.command);
-                    }
                     response.setJsonPayload(
-                        historyController.insert(history),
+                        historyController.insert(
+                            {
+                                id: 0,
+                                command: history.command,
+                                category: history:detectCategory(history.command)
+                            }
+                        ),
                         contentType = "application/json"
                     );
                 }
