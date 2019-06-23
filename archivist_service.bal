@@ -90,7 +90,7 @@ service archivist on httpListener {
     resource function getRules(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.setJsonPayload(
-            ruleController.selectAll(),
+            untaint ruleController.selectAll(),
             contentType = "application/json"
         );
         var result = caller -> respond(response);
@@ -126,6 +126,11 @@ service archivist on httpListener {
             }
         } else {
             response.statusCode = 500;
+        }
+
+        var result = caller -> respond(response);
+        if (result is error) {
+            log:printError("Failed to response", err = result);
         }
     }
 }
