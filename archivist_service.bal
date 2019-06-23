@@ -7,7 +7,7 @@ import db;
 
 listener http:Listener httpListener = new(9090);
 
-db:DbHelper dbHelper = new();
+db:HistoryTableController historyController = new();
 
 @http:ServiceConfig { basePath: "/archivist" }
 service archivist on httpListener {
@@ -31,7 +31,10 @@ service archivist on httpListener {
     }
     resource function getHistories(http:Caller caller, http:Request request) {
         http:Response response = new;
-        response.setJsonPayload(untaint dbHelper.selectAll(), contentType = "application/json");
+        response.setJsonPayload(
+            untaint historyController.selectAll(),
+            contentType = "application/json"
+        );
         var result = caller -> respond(response);
         if (result is error) {
             log:printError("Failed to response", err = result);
@@ -59,7 +62,10 @@ service archivist on httpListener {
                     } else {
                         history.category = db:detectCategory(history.command);
                     }
-                    response.setJsonPayload(dbHelper.insert(history), contentType = "application/json");
+                    response.setJsonPayload(
+                        historyController.insert(history),
+                        contentType = "application/json"
+                    );
                 }
             } else {
                 response.statusCode = 400;

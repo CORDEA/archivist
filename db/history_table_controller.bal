@@ -3,7 +3,7 @@ import ballerina/mysql;
 import ballerina/sql;
 import ballerina/log;
 
-public type DbHelper object {
+public type HistoryTableController object {
     private mysql:Client historyDB;
 
     public function __init() {
