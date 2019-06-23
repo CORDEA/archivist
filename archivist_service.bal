@@ -46,6 +46,40 @@ service archivist on httpListener {
 
     @http:ResourceConfig {
         methods: ["POST"],
+        path: "/histories"
+    }
+    resource function postHistories(http:Caller caller, http:Request request) {
+        http:Response response = new;
+        response.setJsonPayload({}, contentType = "application/json");
+
+        var payload = request.getJsonPayload();
+        if (payload is json) {
+            response.statusCode = 201;
+            var length = payload.length();
+            var i = 0;
+            while (i < length) {
+                var command = <string> payload[i];
+                _ = historyController.insert(
+                    {
+                        id: 0,
+                        command: command,
+                        category: history:detectCategory(command)
+                    }
+                );
+                i += 1;
+            }
+        } else {
+            response.statusCode = 500;
+        }
+
+        var result = caller -> respond(response);
+        if (result is error) {
+            log:printError("Failed to response", err = result);
+        }
+    }
+
+    @http:ResourceConfig {
+        methods: ["POST"],
         path: "/history"
     }
     resource function postHistory(http:Caller caller, http:Request request) {
