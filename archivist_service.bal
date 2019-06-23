@@ -86,31 +86,27 @@ service archivist on httpListener {
         http:Response response = new;
         response.setJsonPayload({}, contentType = "application/json");
 
-        var payload = request.getJsonPayload();
-        if (payload is json) {
-            var history = history:HistoryRequest.convert(payload);
-            if (history is history:HistoryRequest) {
-                if (history.command == "") {
-                    response.statusCode = 400;
-                } else if (containsRule(history.command)){
-                    response.statusCode = 400;
-                } else {
-                    response.statusCode = 201;
-                    response.setJsonPayload(
-                        historyController.insert(
-                            {
-                                id: 0,
-                                command: history.command,
-                                category: history:detectCategory(history.command)
-                            }
-                        ),
-                        contentType = "application/json"
-                    );
-                }
-            } else {
+        var payload = request.getTextPayload();
+        if (payload is string) {
+            if (payload == "") {
                 response.statusCode = 400;
+            } else if (containsRule(payload)){
+                response.statusCode = 400;
+            } else {
+                response.statusCode = 201;
+                response.setJsonPayload(
+                    historyController.insert(
+                        {
+                            id: 0,
+                            command: payload,
+                            category: history:detectCategory(payload)
+                        }
+                    ),
+                    contentType = "application/json"
+                );
             }
         } else {
+            log:printError("Failed to get", err = payload);
             response.statusCode = 500;
         }
 
