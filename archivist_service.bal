@@ -48,7 +48,7 @@ service archivist on httpListener {
 
         var payload = request.getJsonPayload();
         if (payload is json) {
-            db:HistoryRequest|error history = db:HistoryRequest.convert(payload);
+            var history = db:HistoryRequest.convert(payload);
             if (history is db:HistoryRequest) {
                 if (history.command == "") {
                     response.statusCode = 400;
