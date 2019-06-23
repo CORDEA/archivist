@@ -6,4 +6,9 @@ CREATE TABLE IF NOT EXISTS histories (
     Command VARCHAR(3000) NOT NULL,
     Category VARCHAR(255) NOT NULL,
     PRIMARY KEY (ID)
-)
+);
+
+CREATE TABLE IF NOT EXISTS rules (
+    Rule VARCHAR(255) NOT NULL,
+    PRIMARY KEY (Rule)
+);
