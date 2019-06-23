@@ -54,7 +54,11 @@ service archivist on httpListener {
                     response.statusCode = 400;
                 } else {
                     response.statusCode = 201;
-                    history.category = db:UNKNOWN;
+                    if (db:isValidCategory(history.category)) {
+                        history.category = history.category.toUpper();
+                    } else {
+                        history.category = db:detectCategory(history.command);
+                    }
                     response.setJsonPayload(dbHelper.insert(history), contentType = "application/json");
                 }
             } else {
