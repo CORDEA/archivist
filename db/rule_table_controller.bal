@@ -25,4 +25,9 @@ public type RuleTableController object {
         }
         return returnValue;
     }
+
+    public function selectAllAsObject() returns table<Rule>|error {
+        string sql = "SELECT * FROM rules";
+        return historyDB -> select(sql, Rule);
+    }
 };

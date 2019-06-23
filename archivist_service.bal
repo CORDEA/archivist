@@ -56,6 +56,8 @@ service archivist on httpListener {
             if (history is db:HistoryRequest) {
                 if (history.command == "") {
                     response.statusCode = 400;
+                } else if (containsRule(history.command)){
+                    response.statusCode = 400;
                 } else {
                     response.statusCode = 201;
                     if (db:isValidCategory(history.category)) {
@@ -126,4 +128,19 @@ service archivist on httpListener {
             response.statusCode = 500;
         }
     }
+}
+
+function containsRule(string command) returns boolean {
+    var rules = ruleController.selectAllAsObject();
+    if (rules is error) {
+        log:printError("Failed to fetch", err = rules);
+        return false;
+    } else {
+        foreach var rule in rules {
+            if (command.contains(rule.rule)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
