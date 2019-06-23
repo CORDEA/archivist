@@ -8,6 +8,7 @@ import db;
 listener http:Listener httpListener = new(9090);
 
 db:HistoryTableController historyController = new();
+db:RuleTableController ruleController = new();
 
 @http:ServiceConfig { basePath: "/archivist" }
 service archivist on httpListener {
@@ -77,6 +78,52 @@ service archivist on httpListener {
         var result = caller -> respond(response);
         if (result is error) {
             log:printError("Failed to response", err = result);
+        }
+    }
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/rules"
+    }
+    resource function getRules(http:Caller caller, http:Request request) {
+        http:Response response = new;
+        response.setJsonPayload(
+            ruleController.selectAll(),
+            contentType = "application/json"
+        );
+        var result = caller -> respond(response);
+        if (result is error) {
+            log:printError("Failed to response", err = result);
+        }
+    }
+
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/rule"
+    }
+    resource function postRule(http:Caller caller, http:Request request) {
+        http:Response response = new;
+        response.setJsonPayload({}, contentType = "application/json");
+
+        var payload = request.getJsonPayload();
+        if (payload is json) {
+            var rule = db:Rule.convert(payload);
+            if (rule is db:Rule) {
+                if (rule.rule == "") {
+                    response.statusCode = 400;
+                } else {
+                    response.statusCode = 201;
+                    response.setJsonPayload(
+                        ruleController.insert(rule),
+                        contentType = "application/json"
+                    );
+                }
+            } else {
+                log:printError("Failed to convert", err = rule);
+                response.statusCode = 400;
+            }
+        } else {
+            response.statusCode = 500;
         }
     }
 }
