@@ -1,4 +1,5 @@
 import ballerina/http;
+import ballerina/io;
 import ballerina/log;
 import ballerina/config;
 
@@ -47,8 +48,8 @@ service archivist on httpListener {
 
         var payload = request.getJsonPayload();
         if (payload is json) {
-            db:History|error history = db:History.convert(payload);
-            if (history is db:History) {
+            db:HistoryRequest|error history = db:HistoryRequest.convert(payload);
+            if (history is db:HistoryRequest) {
                 if (history.command == "") {
                     response.statusCode = 400;
                 } else {

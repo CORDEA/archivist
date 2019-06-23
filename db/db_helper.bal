@@ -1,6 +1,7 @@
 import ballerina/config;
 import ballerina/mysql;
 import ballerina/sql;
+import ballerina/log;
 
 public type DbHelper object {
     private mysql:Client historyDB;
@@ -16,15 +17,19 @@ public type DbHelper object {
         });
     }
 
-    public function insert(History history) returns json {
-        string sql = "INSERT INTO archivist (ID, Command, Category) VALUES (?,?,?)";
-        var result = self.historyDB -> update(sql, history.id, history.command, history.category);
-        var success = result is sql:UpdateResult;
-        return { "result": success };
+    public function insert(HistoryRequest history) returns json {
+        string sql = "INSERT INTO histories (Command, Category) VALUES (?, ?)";
+        var result = self.historyDB -> update(sql, history.command, history.category);
+        if (result is sql:UpdateResult) {
+            return { "result": true };
+        } else {
+            log:printError("Failed to insert", err = result);
+            return { "result": false };
+        }
     }
 
     public function selectAll() returns json {
-        string sql = "SELECT * FROM archivist";
+        string sql = "SELECT * FROM histories";
         var result = self.historyDB -> select(sql, ());
         json returnValue = {};
         if (result is table<record {}>) {
